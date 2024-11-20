@@ -1,0 +1,15 @@
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int solution(int a, int b) {
+    int answer = 0;
+   
+    string sAnswer1 = to_string(a) + to_string(b);
+    string sAnswer2 = to_string(b) + to_string(a);
+    
+    answer = (stoi(sAnswer1) > stoi(sAnswer2))? stoi(sAnswer1) : stoi(sAnswer2);
+    
+    return answer;
+}

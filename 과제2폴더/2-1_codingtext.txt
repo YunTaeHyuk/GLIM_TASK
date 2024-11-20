@@ -1,0 +1,25 @@
+#include <string>
+#include <vector>
+
+using namespace std;
+int PriceLamb(int n);
+int PriceDrink(int k, int nDiscount);
+
+int solution(int n, int k) {
+    int answer = 0;
+   
+    answer += PriceLamb(n);
+    answer += PriceDrink(k, n/10);
+    
+    return answer;
+}
+
+int PriceLamb(int n)
+{
+    return n * 12000;
+}
+
+int PriceDrink(int k, int nDiscount)
+{
+    return (k-nDiscount) * 2000;
+}

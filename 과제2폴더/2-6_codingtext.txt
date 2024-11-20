@@ -1,0 +1,36 @@
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int solution(string s) {
+    int answer = 0;
+    int nNum = 0;
+    vector<int> v;
+    string snum = "";
+
+    for (int i = 0; i < s.size(); i++)
+    {
+        if (isdigit(s[i])||s[i] == '-')
+        {
+            snum += s[i];
+            if (i == s.size() - 1)
+            {
+                answer += stoi(snum);
+            }
+        }
+
+        if (s[i] == ' '&& s[i-1] != 'Z')
+        {
+            nNum = stoi(snum);
+            answer += stoi(snum);
+            snum = "";
+        }
+
+        if (s[i] == 'Z')
+        {
+            answer -= nNum;
+        }
+    }
+    return answer;
+}
