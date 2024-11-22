@@ -7,6 +7,8 @@
 //MODE
 #define MODE_NO_MENU
 
+#include "includes\UI\CxStatic.h"
+
 /******************************************************************************************************************************
 Window
 ******************************************************************************************************************************/
@@ -19,3 +21,7 @@ Color
 #define COLOR_WHITE						255
 #define COLOR_BLACK						0
 #define COLOR_GRAY						80
+
+#define RGB_WHITE						RGB(0xFF,0xFF,0xFF)
+#define RGB_GRAY						RGB(0x55,0x55,0x55)
+#define RGB_GREEN						RGB(0x00,0xFF,0x00)

@@ -22,16 +22,19 @@ public:
 
 // 작업입니다.
 public:
-	int		m_nImageWidth;
-	int		m_nImageHeight;
-	int		m_nImageBpp;
+	int			m_nImageWidth;
+	int			m_nImageHeight;
+	int			m_nImageBpp;
 
-	int		m_nStartX;
-	int		m_nStartY;
-	int		m_nEndX;
-	int		m_nEndY;
+	int			m_nStartX;
+	int			m_nStartY;
+	int			m_nEndX;
+	int			m_nEndY;
+
+	CxStatic	m_lblCenterMarker;
+	CxStatic	m_lblCenterPos;
 private:
-	CImage	m_Image;
+	CImage		m_Image;
 
 // 재정의입니다.
 public:
@@ -66,6 +69,7 @@ public:
 	BOOL IsinCircle(int nXpos, int nYpos, int nCenterXpos, int nCenterYpos, int nR);
 	BOOL CheckInput();
 	int ChangePos(int nStartPos, int nEndPos);
+	void FindCenter();
 	afx_msg void OnEnChangeEditStartX();
 	afx_msg void OnEnChangeEditStartY();
 	afx_msg void OnEnChangeEditEndX();
