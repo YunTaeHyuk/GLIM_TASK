@@ -14,12 +14,14 @@
 #include "DrawingCircleView.h"
 #include "MainFrm.h"
 #include <random>
+#include <vector>
+#include <algorithm>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-
+using namespace std;
 // CDrawingCircleView
 
 IMPLEMENT_DYNCREATE(CDrawingCircleView, CFormView)
@@ -57,6 +59,8 @@ CDrawingCircleView::~CDrawingCircleView()
 void CDrawingCircleView::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LBL_CENTER_MARKER, m_lblCenterMarker);
+	DDX_Control(pDX, IDC_LBL_CENTER_POS, m_lblCenterPos);
 }
 
 BOOL CDrawingCircleView::PreCreateWindow(CREATESTRUCT& cs)
@@ -73,7 +77,13 @@ void CDrawingCircleView::OnInitialUpdate()
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
 
+	m_lblCenterPos.SetFont("Arial", 15, FW_BOLD);
+	m_lblCenterPos.SetTextColor(RGB_GREEN);
+	m_lblCenterPos.SetBkColor(RGB_WHITE);
 
+	m_lblCenterMarker.SetFont("Arial", 12, FW_BOLD);
+	m_lblCenterMarker.SetTextColor(RGB_GREEN);
+	m_lblCenterMarker.SetBkColor(RGB_GRAY);
 }
 
 // CDrawingCircleView 진단
@@ -103,6 +113,11 @@ CDrawingCircleDoc* CDrawingCircleView::GetDocument() const // 디버그되지 �
 void CDrawingCircleView::OnBnClickedBtnDraw()
 {
 	int nRad;
+
+	GetDlgItem(IDC_LBL_CENTER_MARKER)->MoveWindow(850, 0, 10, 10, 0);
+	GetDlgItem(IDC_LBL_CENTER_MARKER)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_LBL_CENTER_POS)->MoveWindow(850, 0, 10, 10, 0);
+	GetDlgItem(IDC_LBL_CENTER_POS)->ShowWindow(SW_HIDE);
 
 	if (!CheckInput())
 		return;
@@ -147,6 +162,11 @@ void CDrawingCircleView::OnBnClickedBtnAction()
 	CTime t = t.GetCurrentTime();
 	int n = 0;
 
+	GetDlgItem(IDC_LBL_CENTER_MARKER)->MoveWindow(850, 0, 10, 10, 0);
+	GetDlgItem(IDC_LBL_CENTER_MARKER)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_LBL_CENTER_POS)->MoveWindow(850, 0, 10, 10, 0);
+	GetDlgItem(IDC_LBL_CENTER_POS)->ShowWindow(SW_HIDE);
+
 	if (!CheckInput())
 		return;
 
@@ -185,6 +205,10 @@ void CDrawingCircleView::OnBnClickedBtnOpen()
 
 	if (dlg.DoModal() == IDOK)
 	{
+		GetDlgItem(IDC_LBL_CENTER_MARKER)->MoveWindow(850, 0, 10, 10, 0);
+		GetDlgItem(IDC_LBL_CENTER_MARKER)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_LBL_CENTER_POS)->MoveWindow(850, 0, 10, 10, 0);
+		GetDlgItem(IDC_LBL_CENTER_POS)->ShowWindow(SW_HIDE);
 		strFullPath = dlg.GetPathName();
 		strExt = dlg.GetFileExt();
 		strFile = dlg.GetFileName();
@@ -194,9 +218,12 @@ void CDrawingCircleView::OnBnClickedBtnOpen()
 		{
 			m_Image.Destroy();
 		}
+		
 		m_Image.Load(strFullPath);
-
+		
 		UpdateDisplay();
+		
+		FindCenter();	
 	}
 }
 
@@ -249,6 +276,46 @@ void CDrawingCircleView::DrawCircle(unsigned char* fm, int nXpos, int nYpos, int
 
 		}
 	}
+}
+
+void CDrawingCircleView::FindCenter()
+{
+	unsigned char* fm = (unsigned char*)m_Image.GetBits();
+	int nPitch = m_Image.GetPitch();
+	vector <int> nX;
+	vector <int> nY;
+	CString sStr;
+
+	int nCenterXPos = 0;
+	int nCenterYPos = 0;
+
+	for (int j = 0; j < m_nImageHeight; j++)
+	{
+		for (int i = 0; i < m_nImageWidth; i++)
+		{
+			if (fm[j * nPitch + i] == COLOR_GRAY)
+			{
+				nX.push_back(i);
+				nY.push_back(j);
+			}
+		}
+	}
+	sort(nX.begin(), nX.end());
+	sort(nY.begin(), nY.end());
+	nX.erase(unique(nX.begin(), nX.end()), nX.end());
+	nY.erase(unique(nY.begin(), nY.end()), nY.end());
+
+	nCenterXPos = nX[nX.size() / 2];
+	nCenterYPos = nY[nY.size() / 2];
+	sStr.Format("[%d,%d]", nCenterXPos, nCenterYPos);
+
+	GetDlgItem(IDC_LBL_CENTER_MARKER)->MoveWindow(nCenterXPos-4, nCenterYPos-4, 8, 8);
+	GetDlgItem(IDC_LBL_CENTER_MARKER)->ShowWindow(SW_SHOW);
+
+	SetDlgItemText(IDC_LBL_CENTER_POS, sStr);
+	GetDlgItem(IDC_LBL_CENTER_POS)->MoveWindow(nCenterXPos, nY[nY.size()-1]+2, 55, 15);
+	GetDlgItem(IDC_LBL_CENTER_POS)->ShowWindow(SW_SHOW);
+
 }
 
 BOOL CDrawingCircleView::IsinCircle(int nXpos, int nYpos, int nCenterXpos, int nCenterYpos, int nR)
@@ -375,8 +442,6 @@ BOOL CDrawingCircleView::CheckInput()
 
 int CDrawingCircleView::ChangePos(int nStartPos, int nEndPos)
 {
-	int nResult;
-
 	if (nStartPos < nEndPos)
 	{
 		if ((nEndPos - nStartPos) >= 100)
